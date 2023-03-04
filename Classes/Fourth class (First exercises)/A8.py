@@ -19,7 +19,8 @@ def unconstrained_objective(x,alpha,I,p):
 initial_guess = (I/p)/6
 res = optimize.minimize(
     unconstrained_objective,initial_guess,
-    method='Nelder-Mead',args=(alpha,I,p),options={'maxiter':5000},tol=1e-10)
+    method='Nelder-Mead',args=(alpha,I,p),options={'maxiter':5000},tol=1e-10000) 
+#It will only try 5000 times with this option. Tol is the criteria for stopping. The difference must be lower than that
 
 print(res.message)
 
