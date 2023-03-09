@@ -1,3 +1,4 @@
+import numpy as np
 # a. parameter choices
 sigma = 3.14
 omega = 2
