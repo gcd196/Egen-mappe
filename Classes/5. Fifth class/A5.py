@@ -17,7 +17,6 @@ e2 = np.random.exponential(beta2, size=N)
 
 # c. demand function
 
-
 def demand_good_1_func(alpha, p1, p2, e1, e2):
     I = p1*e1+p2*e2
     return alpha*I/p1
