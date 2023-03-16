@@ -24,22 +24,24 @@ class HouseholdSpecializationModelClass:
 
         # c. household production
         par.alpha = 0.5
+        par.alpha_vec=(0.25,0.5,0.75)
         par.sigma = 1.0
+        par.sigma_vec=(0.5,1.0,1.5)
 
         # d. wages
         par.wM = 1.0
         par.wF = 1.0
-        par.wF_vec = np.linspace(0.8,1.2,5)
+        par.wF_vec = np.linspace(0.8,1.2,5) #Vector for the female wage. Can be useful. 
 
         # e. targets
         par.beta0_target = 0.4
         par.beta1_target = -0.1
 
         # f. solution
-        sol.LM_vec = np.zeros(par.wF_vec.size)
-        sol.HM_vec = np.zeros(par.wF_vec.size)
-        sol.LF_vec = np.zeros(par.wF_vec.size)
-        sol.HF_vec = np.zeros(par.wF_vec.size)
+        sol.LM_vec = np.zeros(par.wF_vec.size) #Hours worked by men
+        sol.HM_vec = np.zeros(par.wF_vec.size) #Working at home by men
+        sol.LF_vec = np.zeros(par.wF_vec.size) #Hours worked by women
+        sol.HF_vec = np.zeros(par.wF_vec.size) #Working at home for women
 
         sol.beta0 = np.nan
         sol.beta1 = np.nan
@@ -53,8 +55,16 @@ class HouseholdSpecializationModelClass:
         # a. consumption of market goods
         C = par.wM*LM + par.wF*LF
 
-        # b. home production
-        H = HM**(1-par.alpha)*HF**par.alpha
+        # b. home production #Changed 16. march. based on Jonas' formula
+        if par.sigma == 0:
+            H=np.fmin(HM,HF)
+        elif par.sigma == 1:
+            H = HM**(1-par.alpha)*HF**par.alpha
+        else:
+            H= ((1-par.alpha)*HM**((par.sigma-1)/par.sigma)+
+                par.alpha*HF**((par.sigma-1)/par.sigma))**(par.sigma/(par.sigma-1))
+
+
 
         # c. total consumption utility
         Q = C**par.omega*H**(1-par.omega)
@@ -64,7 +74,7 @@ class HouseholdSpecializationModelClass:
         epsilon_ = 1+1/par.epsilon
         TM = LM+HM
         TF = LF+HF
-        disutility = par.nu*(TM**epsilon_/epsilon_+TF**epsilon_/epsilon_)
+        disutility = par.nu*(TM**epsilon_/epsilon_+TF**epsilon_/epsilon_) #Notice definition of epsilon_
         
         return utility - disutility
 
@@ -76,33 +86,33 @@ class HouseholdSpecializationModelClass:
         opt = SimpleNamespace()
         
         # a. all possible choices
-        x = np.linspace(0,24,49)
-        LM,HM,LF,HF = np.meshgrid(x,x,x,x) # all combinations
+        x = np.linspace(0,24,49) #It creases 49 number evenly distributed between 0 and 24. I.e. restrictions
+        LM,HM,LF,HF = np.meshgrid(x,x,x,x) # all combinations based on restrictions. It makes four vectors
     
-        LM = LM.ravel() # vector
-        HM = HM.ravel()
+        LM = LM.ravel() # make it a vector 1. dimensional. All combination. Each element one combination. 
+        HM = HM.ravel() 
         LF = LF.ravel()
         HF = HF.ravel()
 
         # b. calculate utility
-        u = self.calc_utility(LM,HM,LF,HF)
+        u = self.calc_utility(LM,HM,LF,HF) #Saves all values
     
         # c. set to minus infinity if constraint is broken
         I = (LM+HM > 24) | (LF+HF > 24) # | is "or"
         u[I] = -np.inf
     
         # d. find maximizing argument
-        j = np.argmax(u)
+        j = np.argmax(u) #Returns the index for the maximum of all the values. NOT VALUE. 
         
-        opt.LM = LM[j]
-        opt.HM = HM[j]
+        opt.LM = LM[j] #Finds the maximum value
+        opt.HM = HM[j] 
         opt.LF = LF[j]
         opt.HF = HF[j]
 
         # e. print
         if do_print:
             for k,v in opt.__dict__.items():
-                print(f'{k} = {v:6.4f}')
+                print(f'{k} = {v:6.4f}') #Prints value. 
 
         return opt
 
