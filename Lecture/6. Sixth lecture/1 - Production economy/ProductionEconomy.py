@@ -1,4 +1,4 @@
-from types import SimpleNamespace
+c_w_starfrom types import SimpleNamespace
 import numpy as np
 from scipy import optimize
 
