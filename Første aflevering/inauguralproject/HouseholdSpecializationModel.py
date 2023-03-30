@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-
+#TEst af ny pc
 import numpy as np
 from scipy import optimize
 
