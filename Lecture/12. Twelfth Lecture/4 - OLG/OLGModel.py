@@ -130,7 +130,7 @@ def find_s_bracket(par,sim,t,maxiter=500,do_print=False):
                 print(f'bracket to search in with opposite signed errors:')
                 print(f'[{s_min:12.8f}-{s_max:12.8f}]')
             return s_min,s_max
-        elif not valid: # too low s -> increase lower bound
+        elif not valid: # too low s -> increase lower bound)
             lower = s
         else: # too high s -> increase upper bound
             upper = s
